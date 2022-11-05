@@ -1,0 +1,45 @@
+services:
+  backend-feed:
+    environment:
+      AWS_BUCKET: arn:aws:s3:::udgram-630412096630-dev
+      AWS_PROFILE: default
+      AWS_REGION: us-east-1
+      JWT_SECRET: testing
+      POSTGRES_DB: postgres
+      POSTGRES_HOST: database-1.cm6hj6hzu1cm.us-east-1.rds.amazonaws.com
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USERNAME: postgres
+      URL: http://localhost:8100
+    image: udagram-api-feed
+    volumes:
+    - C:\Users\Mohamed\.aws:/root/.aws:rw
+  backend-user:
+    environment:
+      AWS_BUCKET: arn:aws:s3:::udgram-630412096630-dev
+      AWS_PROFILE: default
+      AWS_REGION: us-east-1
+      JWT_SECRET: testing
+      POSTGRES_DB: postgres
+      POSTGRES_HOST: database-1.cm6hj6hzu1cm.us-east-1.rds.amazonaws.com
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USERNAME: postgres
+      URL: http://localhost:8100
+    image: udagram-api-user
+  frontend:
+    image: udagram-frontend:local
+    ports:
+    - published: 8100
+      target: 80
+  reverseproxy:
+    depends_on:
+      backend-feed:
+        condition: service_started
+      backend-user:
+        condition: service_started
+    image: reverseproxy
+    ports:
+    - published: 8080
+      target: 8080
+    restart: always
+version: '3'
+
