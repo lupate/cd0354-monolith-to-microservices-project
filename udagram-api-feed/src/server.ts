@@ -2,16 +2,14 @@ import cors from 'cors';
 import express from 'express';
 import {sequelize} from './sequelize';
 
-import {IndexRouter} from './controllers/v0/index.router';
 
 import bodyParser from 'body-parser';
 import {config} from './config/config';
-import {V0_FEED_MODELS, V0_USER_MODELS} from './controllers/v0/model.index';
+import {V0_FEED_MODELS} from './controllers/v0/model.index';
 
 
 (async () => {
   await sequelize.addModels(V0_FEED_MODELS);
-  await sequelize.addModels(V0_USER_MODELS);
 
   console.debug("Initialize database connection...");
   await sequelize.sync();
@@ -35,7 +33,6 @@ import {V0_FEED_MODELS, V0_USER_MODELS} from './controllers/v0/model.index';
     origin: '*',
   }));
 
-  app.use('/api/v0/', IndexRouter);
 
   // Root URI call
   app.get( '/', async ( req, res ) => {
