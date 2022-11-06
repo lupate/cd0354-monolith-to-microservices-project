@@ -18,5 +18,27 @@ spec:
       containers:
         - name:  udagram-frontend
           image: lupate01/udagram-frontend:latest
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
           imagePullPolicy: Always
       restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udagram-frontend-service
+  namespace: udagram
+  labels:
+    app: udagram-frontend
+spec:
+  ports:
+    - name: "8100"
+      port: 8100
+      targetPort: 80
+  selector:
+    service: udagram-frontend

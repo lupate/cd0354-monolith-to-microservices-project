@@ -6,7 +6,7 @@ metadata:
   name: udagram-api-feed
   namespace: udagram
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: udagram-api-feed
@@ -20,7 +20,7 @@ spec:
           name: udagram-api-feed
           resources:
             requests:
-              memory: "64Mi"
+              memory: "1024Mi"
               cpu: "250m"
             limits:
               memory: "1024Mi"
@@ -39,3 +39,18 @@ spec:
         - name: aws-secret
           secret:
             secretName: aws-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udagram-feed-api-service
+  namespace: udagram
+  labels:
+    app: udagram-feed-api
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: udagram-feed-api

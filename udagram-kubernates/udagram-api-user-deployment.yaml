@@ -20,7 +20,7 @@ spec:
           name: udagram-api-user
           resources:
             requests:
-              memory: "64Mi"
+              memory: "1024Mi"
               cpu: "250m"
             limits:
               memory: "1024Mi"
@@ -39,3 +39,18 @@ spec:
         - name: aws-secret
           secret:
             secretName: aws-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udagram-user-api-service
+  namespace: udagram
+  labels:
+    app: udagram-user-api
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: udagram-user-api
