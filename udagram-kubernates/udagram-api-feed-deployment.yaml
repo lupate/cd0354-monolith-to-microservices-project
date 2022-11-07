@@ -6,7 +6,7 @@ metadata:
   name: udagram-api-feed
   namespace: udagram
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: udagram-api-feed
@@ -23,7 +23,7 @@ spec:
               memory: "1024Mi"
               cpu: "250m"
             limits:
-              memory: "1024Mi"
+              memory: "2048Mi"
               cpu: "500m"
           envFrom:
             - configMapRef:
