@@ -15,12 +15,12 @@ script:
   - docker --version
   - docker build -f udagram-api-feed/Dockerfile -t  lupate01/udagram-api-feed:v1 udagram-api-feed
   - docker build -f udagram-api-user/Dockerfile -t  lupate01/udagram-api-user:v1 udagram-api-user
-  - docker build -f udagram-frontend/Dockerfile -t  lupate01/udagram-frontend:v1 udagram-frontend
+  - docker build -f udagram-frontend/Dockerfile -t  lupate01/udagram-frontend:v3 udagram-frontend
   - docker build -f udagram-reverseproxy/Dockerfile -t  lupate01/udagram-reverseproxy:v1 udagram-reverseproxy
 
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push lupate01/udagram-api-feed:v1
   - docker push lupate01/udagram-api-user:v1
-  - docker push lupate01/udagram-frontend:v1
+  - docker push lupate01/udagram-frontend:v3
   - docker push lupate01/udagram-reverseproxy:v1

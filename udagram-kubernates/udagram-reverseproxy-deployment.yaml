@@ -16,7 +16,7 @@ spec:
         app: udagram-reverseproxy
     spec:
       containers:
-        - image: lupate01/udagram-reverseproxy:latest
+        - image: lupate01/udagram-reverseproxy:v1
           name: udagram-reverseproxy
           resources:
             requests:

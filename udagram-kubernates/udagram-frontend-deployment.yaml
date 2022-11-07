@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name:  udagram-frontend
-          image: lupate01/udagram-frontend:latest
+          image: lupate01/udagram-frontend:v3
           resources:
             requests:
               memory: "512Mi"

@@ -16,7 +16,7 @@ spec:
         app: udagram-api-feed
     spec:
       containers:
-        - image: lupate01/udagram-api-feed:latest
+        - image: lupate01/udagram-api-feed:v1
           name: udagram-api-feed
           resources:
             requests:

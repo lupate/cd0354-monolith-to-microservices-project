@@ -1,0 +1,151 @@
+--- nodes
+$ kubectl get nodes -n udagram
+NAME                             STATUS   ROLES    AGE   VERSION
+ip-192-168-30-202.ec2.internal   Ready    <none>   8h    v1.23.9-eks-ba74326
+ip-192-168-56-68.ec2.internal    Ready    <none>   8h    v1.23.9-eks-ba74326
+
+--- pods
+$ kubectl top pods -n udagram
+NAME                                    CPU(cores)   MEMORY(bytes)
+udagram-api-feed-79d4f678db-f887h       0m           38Mi
+udagram-api-user-7dd99f86bf-47tmf       1m           55Mi
+udagram-frontend-7d5bd6ff5-g8bwq        0m           3Mi
+udagram-reverseproxy-78d5bcc45f-wjzvb   0m           2Mi
+
+--- services
+$ kubectl describe services -n udagram
+Name:              udagram-feed-api-service
+Namespace:         udagram
+Labels:            app=udagram-feed-api
+Annotations:       <none>
+Selector:          app=udagram-feed-api
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.100.97.0
+IPs:               10.100.97.0
+Port:              8080  8080/TCP
+TargetPort:        8080/TCP
+Endpoints:         <none>
+Session Affinity:  None
+Events:            <none>
+
+
+Name:              udagram-frontend-service
+Namespace:         udagram
+Labels:            app=udagram-frontend
+Annotations:       <none>
+Selector:          service=udagram-frontend
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.100.22.167
+IPs:               10.100.22.167
+Port:              8100  8100/TCP
+TargetPort:        80/TCP
+Endpoints:         <none>
+Session Affinity:  None
+Events:            <none>
+
+
+Name:              udagram-reverseproxy-service
+Namespace:         udagram
+Labels:            app=udagram-reverseproxy
+Annotations:       <none>
+Selector:          app=udagram-reverseproxy
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.100.100.159
+IPs:               10.100.100.159
+Port:              8080  8080/TCP
+TargetPort:        8080/TCP
+Endpoints:         192.168.56.250:8080
+Session Affinity:  None
+Events:            <none>
+
+
+Name:              udagram-user-api-service
+Namespace:         udagram
+Labels:            app=udagram-user-api
+Annotations:       <none>
+Selector:          app=udagram-user-api
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.100.209.91
+IPs:               10.100.209.91
+Port:              8080  8080/TCP
+TargetPort:        8080/TCP
+Endpoints:         <none>
+Session Affinity:  None
+Events:            <none>
+
+--- depolyments
+$ kubectl get deployments -n udagram
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+udagram-api-feed       1/1     1            1           17h
+udagram-api-user       1/1     1            1           17h
+udagram-frontend       1/1     1            1           17h
+udagram-reverseproxy   1/1     1            1           17h
+
+--- pods after auto-scale
+$ kubectl autoscale deployment udagram-api-feed --cpu-percent=70 --min=3 --max=5 -n udagram
+horizontalpodautoscaler.autoscaling/udagram-api-feed autoscaled
+$ kubectl get pods -n udagram
+NAME                                    READY   STATUS    RESTARTS       AGE
+udagram-api-feed-79d4f678db-f887h       1/1     Running   0              28m
+udagram-api-feed-79d4f678db-mcknl       1/1     Running   0              36s
+udagram-api-feed-79d4f678db-t478x       1/1     Running   0              36s
+udagram-api-user-7dd99f86bf-47tmf       1/1     Running   0              27m
+udagram-frontend-7d5bd6ff5-g8bwq        1/1     Running   0              17h
+udagram-reverseproxy-78d5bcc45f-wjzvb   1/1     Running   15 (14h ago)   15h
+
+--- metrics
+$ kubectl top pods -n udagram
+NAME                                    CPU(cores)   MEMORY(bytes)
+udagram-api-feed-79d4f678db-f887h       0m           38Mi
+udagram-api-feed-79d4f678db-mcknl       0m           39Mi
+udagram-api-feed-79d4f678db-qwm8w       0m           38Mi
+udagram-api-feed-79d4f678db-t478x       0m           38Mi
+udagram-api-feed-79d4f678db-w8rlf       0m           38Mi
+udagram-api-user-7dd99f86bf-47tmf       0m           40Mi
+udagram-frontend-7d5bd6ff5-g8bwq        0m           3Mi
+udagram-reverseproxy-78d5bcc45f-wjzvb   0m           2Mi
+
+--- HPA
+$ kubectl describe hpa -n udagram
+Warning: autoscaling/v2beta2 HorizontalPodAutoscaler is deprecated in v1.23+, unavailable in v1.26+; use autoscaling/v2 HorizontalPodAutoscaler
+Name:                                                  udagram-api-feed
+Namespace:                                             udagram
+Labels:                                                <none>
+Annotations:                                           <none>
+CreationTimestamp:                                     Mon, 07 Nov 2022 11:38:21 +0200
+Reference:                                             Deployment/udagram-api-feed
+Metrics:                                               ( current / target )
+  resource cpu on pods  (as a percentage of request):  0% (0) / 70%
+Min replicas:                                          3
+Max replicas:                                          5
+Deployment pods:                                       5 current / 5 desired
+Conditions:
+  Type            Status  Reason               Message
+  ----            ------  ------               -------
+  AbleToScale     True    ScaleDownStabilized  recent recommendations were higher than current one, applying the highest recent recommendation
+  ScalingActive   True    ValidMetricFound     the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+  ScalingLimited  True    TooManyReplicas      the desired replica count is more than the maximum replica count
+Events:
+  Type    Reason             Age    From                       Message
+  ----    ------             ----   ----                       -------
+  Normal  SuccessfulRescale  6m39s  horizontal-pod-autoscaler  New size: 3; reason: Current number of replicas below Spec.MinReplicas
+  Normal  SuccessfulRescale  5m39s  horizontal-pod-autoscaler  New size: 5; reason: cpu resource utilization (percentage of request) above target
+
+--- after load balancer
+$ kubectl get services -n udagram
+NAME                           TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+publicfrontend                 LoadBalancer   10.100.138.228   afcd240ff0e1d4e80800290cb6ad8692-1761733798.us-east-1.elb.amazonaws.com   80:31363/TCP   75s
+publicreverseproxy             LoadBalancer   10.100.242.248   a608e7020dd564410a31df7072b23573-20247559.us-east-1.elb.amazonaws.com     80:30507/TCP   22s
+udagram-api-feed-service       ClusterIP      10.100.15.213    <none>                                                                    8080/TCP       6m47s
+udagram-api-user-service       ClusterIP      10.100.244.113   <none>                                                                    8080/TCP       7m1s
+udagram-frontend-service       ClusterIP      10.100.23.191    <none>                                                                    8100/TCP       6m30s
+udagram-reverseproxy-service   ClusterIP      10.100.102.231   <none>                                                                    8080/TCP       6m15s
+

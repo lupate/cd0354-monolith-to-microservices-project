@@ -16,7 +16,7 @@ spec:
         app: udagram-api-user
     spec:
       containers:
-        - image: lupate01/udagram-api-user:latest
+        - image: lupate01/udagram-api-user:v1
           name: udagram-api-user
           resources:
             requests:
